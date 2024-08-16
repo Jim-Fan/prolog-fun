@@ -234,4 +234,242 @@ Furthermore char 6 and 9 are determined as `D` and `N` respectively. This time I
 
 !['Codeword with Word5-8 highlighted](./assets/codeword-word5-to-word8-highlighted.png)
 
-(To be Continued)
+~~~~
+format('~nQuery output:~n~n'),
+
+C5 = 'C',
+C1 = 'R',
+C15 = 'U',
+
+word(Word1),
+string_chars(Word1, [C23, C5, C5, C1, C15, C12, C6]),
+word(Word2),
+string_chars(Word2, [C5, C26, C12, C12, C1, C20, C15, C22]),
+word(Word3),
+string_chars(Word3, [C8, C21, C1, C23, C20, C20, C12]),
+word(Word4),
+string_chars(Word4, [C8, C15, C21, C6, C23, C9, C5, C12]),
+
+word(Word5),
+string_chars(Word5, [C18, C9, C12, C23, C6]),
+word(Word6),
+string_chars(Word6, [C12, C3, C15, C23, C22]),
+word(Word7),
+string_chars(Word7, [C1, C12, C10, C12, C6, C21, C12, C6]),
+word(Word8),
+string_chars(Word8, [C6, C21, C9, C8, C2]),
+
+format('Word1 = ~w', [Word1]), nl,
+format('Word2 = ~w', [Word2]), nl,
+format('Word3 = ~w', [Word3]), nl,
+format('Word4 = ~w', [Word4]), nl,
+format('Word5 = ~w', [Word5]), nl,
+format('Word6 = ~w', [Word6]), nl,
+format('Word7 = ~w', [Word7]), nl,
+format('Word8 = ~w', [Word8]), nl,
+nl,
+fail.
+~~~~
+
+~~~~
+Query output:   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = KNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGE   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = KNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGY   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = KNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGO   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = KNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGS   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = SNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGE   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = SNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGY   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = SNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGO   
+                
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+Word4 = GUIDANCE
+Word5 = SNEAD   
+Word6 = EQUAL   
+Word7 = REMEDIED
+Word8 = DINGS   
+                
+false.          
+~~~~
+
+
+Final version which generates exactly one set of solution:
+
+~~~~
+format('~nQuery output:~n~n'),
+
+C5 = 'C',
+C1 = 'R',
+C15 = 'U',
+
+word(Word1),
+string_chars(Word1, [C23, C5, C5, C1, C15, C12, C6]),
+word(Word2),
+string_chars(Word2, [C5, C26, C12, C12, C1, C20, C15, C22]),
+word(Word3),
+string_chars(Word3, [C8, C21, C1, C23, C20, C20, C12]),
+word(Word4),
+string_chars(Word4, [C8, C15, C21, C6, C23, C9, C5, C12]),
+
+word(Word5),
+string_chars(Word5, [C18, C9, C12, C23, C6]),
+word(Word6),
+string_chars(Word6, [C12, C3, C15, C23, C22]),
+word(Word7),
+string_chars(Word7, [C1, C12, C10, C12, C6, C21, C12, C6]),
+word(Word8),
+string_chars(Word8, [C6, C21, C9, C8, C2]),
+
+% I can see C2 and C18 both maps to 'E'. C18 was determined as 'E' so C2 cannot
+C2 \= 'E',
+
+word(Word9),
+string_chars(Word9, [C20, C2, C22, C6]),
+word(Word10),
+string_chars(Word10, [C4, C23, C5, C18, C6, C23, C25]),
+word(Word11),
+string_chars(Word11, [C23, C5, C10, C12]),
+word(Word12),
+string_chars(Word12, [C23, C6, C23, C16, C24]),
+word(Word13),
+string_chars(Word13, [C20, C12, C9, C5, C12]),
+word(Word14),
+string_chars(Word14, [C4, C23, C14, C14]),
+
+word(Word15),
+string_chars(Word15, [C19, C23, C15, C22, C24, C21, C9, C8]),
+word(Word16),
+string_chars(Word16, [C9, C23, C16, C12]),
+
+word(Word17),
+string_chars(Word17, [C7, C22, C23, C6, C12]),
+word(Word18),
+string_chars(Word18, [C13, C11, C9, C2, C9, C11, C10]),
+word(Word19),
+string_chars(Word19, [C23, C8, C1, C12, C12]),
+
+word(Word20),
+string_chars(Word20, [C7, C1, C23, C21, C9]),
+word(Word21),
+string_chars(Word21, [C23, C5, C5, C12, C9, C24]),
+word(Word22),
+string_chars(Word22, [C19, C12, C17, C12, C6]),
+
+word(Word23),
+string_chars(Word23, [C16, C15, C14, C14, C22, C12, C6]),
+word(Word24),
+string_chars(Word24, [C23, C19, C23, C21, C22]),
+word(Word25),
+string_chars(Word25, [C5, C26, C12, C23, C16, C22, C11]),
+word(Word26),
+string_chars(Word26, [C13, C10, C15, C8, C22, C11]),
+
+% These are retrospectively added after checking duplication output
+C7 \= C8,
+C5 \= C7,
+C9 \= C17,
+C6 \= C14,
+
+format('C1  = ~w   C2  = ~w   C3  = ~w   C4  = ~w   C5  = ~w', [C1, C2, C3, C4, C5]), nl,
+format('C6  = ~w   C7  = ~w   C8  = ~w   C9  = ~w   C10 = ~w', [C6, C7, C8, C9, C10]), nl,
+format('C11 = ~w   C12 = ~w   C13 = ~w   C14 = ~w   C15 = ~w', [C11, C12, C13, C14, C15]), nl,
+format('C16 = ~w   C17 = ~w   C18 = ~w   C19 = ~w   C20 = ~w', [C16, C17, C18, C19, C20]), nl,
+format('C21 = ~w   C22 = ~w   C23 = ~w   C24 = ~w   C25 = ~w   C26 = ~w', [C21, C22, C23, C24, C25, C26]), nl, nl,
+
+format('Word1  = ~w', [Word1]), nl,
+format('Word2  = ~w', [Word2]), nl,
+format('Word3  = ~w', [Word3]), nl,
+format('Word4  = ~w', [Word4]), nl,
+format('Word5  = ~w', [Word5]), nl,
+format('Word6  = ~w', [Word6]), nl,
+format('Word7  = ~w', [Word7]), nl,
+format('Word8  = ~w', [Word8]), nl,
+format('Word9  = ~w', [Word9]), nl,
+format('Word10 = ~w', [Word10]), nl,
+format('Word11 = ~w', [Word11]), nl,
+format('Word12 = ~w', [Word12]), nl,
+format('Word13 = ~w', [Word13]), nl,
+format('Word14 = ~w', [Word14]), nl,
+format('Word15 = ~w', [Word15]), nl,
+format('Word16 = ~w', [Word16]), nl,
+format('Word17 = ~w', [Word17]), nl,
+format('Word18 = ~w', [Word18]), nl,
+format('Word19 = ~w', [Word19]), nl,
+format('Word20 = ~w', [Word20]), nl,
+format('Word21 = ~w', [Word21]), nl,
+format('Word22 = ~w', [Word22]), nl,
+format('Word23 = ~w', [Word23]), nl,
+format('Word24 = ~w', [Word24]), nl,
+format('Word25 = ~w', [Word25]), nl,
+format('Word26 = ~w', [Word26]), nl, nl,
+
+format('Duplication:'), nl,
+Solution = [C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16, C17, C18, C19, C20, C21, C22, C23, C24, C25, C26],
+member(X, Solution),
+member(Y, Solution),
+nth1(Ind1, Solution, X),
+nth1(Ind2, Solution, Y),
+X = Y,
+Ind1 \= Ind2,
+format('X = ~w   Ind1 = ~w   Y = ~w   Ind2 = ~w', [X, Y, Ind1, Ind2]), nl,
+
+nl,
+fail.
+~~~~
