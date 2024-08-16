@@ -85,7 +85,7 @@ Because:
 1. It has three instances of known characters
 2. It contains character 12 which I believe has been determined in `Word1`
 
-In Prolog, leverage _known facts_ as heuristics is an important tactic for optimising search space (therefore, runtime). In word [5, 26, 12, 12, 1, 20, 15, 22], assuming character 12 is not determined, there are four unknown characters giving possible combinations of (26-4) x (26-5) x (26-6) x (26-7) = 175560. If we trust that character 12 has indeed been determined, there are only three unknowns leaving (26-4) x (26-5) x (26-6) = 9240 possible combinations.
+In Prolog, leveraging _known facts_ as heuristics is an important tactic for optimising search space (therefore, runtime). In word [5, 26, 12, 12, 1, 20, 15, 22], assuming character 12 is not determined, there are four unknown characters giving possible combinations of (26-4) x (26-5) x (26-6) x (26-7) = 175560. If we trust that character 12 has indeed been determined, there are only three unknowns leaving (26-4) x (26-5) x (26-6) = 9240 possible combinations.
 
 If another word, for exmaple, [19, 23, 15, 22, 24, 21, 9, 8] is used, where there are seven unknown characters, there could be (26-4) x (26-5) x (26-6) x (26-7) x (26-8) x (26-9) x (26-10) = 859541760 possibilities. This would likely damage runtime very badly. Take this for granted for now without further elaboration.
 
@@ -125,5 +125,113 @@ Word2 = CHEERFUL
 ~~~~
 
 Result looks promising in that `Word2` appears to be completely resolved.
+
+We pick the next word to try by highlighting supposedly determined characters in the puzzle and look for the next plausible one. Having A (char 23) and E (char 12) resolved is really useful because they are most frequent among English words. Again we choose word that has relatively more known cracked characters:
+
+![Codeword with more known chars and Word3 highlighted](./assets/codeword-word3-highlighted.png)
+
+[8, 21, 1, 23, 20, 20, 12] seems to be good choice because it has many known characters. Also char 21 and 23 are rather frequent in other unknown words.
+
+Update query again and run:
+
+~~~~
+format('~nQuery output:~n~n'),
+
+C5 = 'C',
+C1 = 'R',
+C15 = 'U',
+
+word(Word1),
+string_chars(Word1, [C23, C5, C5, C1, C15, C12, C6]),
+word(Word2),
+string_chars(Word2, [C5, C26, C12, C12, C1, C20, C15, C22]),
+word(Word3),
+string_chars(Word3, [C8, C21, C1, C23, C20, C20, C12]),
+
+format('Word1 = ~w', [Word1]), nl,
+format('Word2 = ~w', [Word2]), nl,
+format('Word3 = ~w', [Word3]), nl,
+nl,
+fail.
+~~~~
+
+Prolog's respond:
+
+~~~~
+Query output:   
+
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = AGRAFFE    <==
+
+Word1 = ACCRUED 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+
+Word1 = ACCRUER 
+Word2 = CHEERFUL
+Word3 = AGRAFFE    <==
+
+Word1 = ACCRUER 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+
+Word1 = ACCRUES 
+Word2 = CHEERFUL
+Word3 = AGRAFFE    <==
+
+Word1 = ACCRUES 
+Word2 = CHEERFUL
+Word3 = GIRAFFE 
+
+false.
+~~~~
+
+Something interesting about this output. Prolog suggests `Word3` could be `AGRAFFE`. Although Prolog has not been told, yet we know that this cannot be the case, because unknown characters are distinct. Char 8 and 23 cannot both map to `A` at the same time.
+
+Despite this we know that char 8 might be `A` or `G` while char 21 might be `G` or `I`. Let's ask Prolog to search for words that have char 8, char 21 and char 23 in the hope to have them nailed. [8, 15, 21, 6, 23, 9, 5, 12] looks like the definite choice:
+
+![Codeword with Word4 highlighted](./assets/codeword-word4-highlighted.png)
+
+~~~~
+format('~nQuery output:~n~n'),
+
+C5 = 'C',
+C1 = 'R',
+C15 = 'U',
+
+word(Word1),
+string_chars(Word1, [C23, C5, C5, C1, C15, C12, C6]),
+word(Word2),
+string_chars(Word2, [C5, C26, C12, C12, C1, C20, C15, C22]),
+word(Word3),
+string_chars(Word3, [C8, C21, C1, C23, C20, C20, C12]),
+word(Word4),
+string_chars(Word4, [C8, C15, C21, C6, C23, C9, C5, C12]),
+
+format('Word1 = ~w', [Word1]), nl,
+format('Word2 = ~w', [Word2]), nl,
+format('Word3 = ~w', [Word3]), nl,
+format('Word4 = ~w', [Word4]), nl,
+nl,
+fail.
+~~~~
+
+In Prolog's respond we can see the uncertainties above are resolved since the output contains exactly one set of `Word[1-4]`:
+
+~~~~
+Query output:
+
+Word1 = ACCRUED
+Word2 = CHEERFUL
+Word3 = GIRAFFE
+Word4 = GUIDANCE
+
+false.
+~~~~
+
+Furthermore char 6 and 9 are determined as `D` and `N` respectively. This time I am taking a greater leap by adding four more words in the query, introducing unknown characters 2, 3, 10 and 18:
+
+!['Codeword with Word5-8 highlighted](./assets/codeword-word5-to-word8-highlighted.png)
 
 (To be Continued)
