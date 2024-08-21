@@ -4,7 +4,7 @@
 Having started self-learning and using Prolog since 2016, I think I might be able to contribute a bit to Prolog by sharing some of my own use cases of the language.
 -->
 
-Recently I found a puzzle solving competition when randomly browsing in WH Smith. The compeition comes with cash prices and it attracted my attention. So I started pursuing in the hope to earn some extra money.
+Recently I found a puzzle solving competition when randomly browsing in WH Smith. The compeition comes with cash prices and it attracted my attention. So I started pursuing in the hope to earn some extra money (I heard you laughed).
 
 The compeition is to solve a codeword puzzle such as (but not exactly) below. Image is taken from [puzzler.com](https://www.puzzler.com/media/puzzles/samples/Codeword.pdf):
 
@@ -12,11 +12,11 @@ The compeition is to solve a codeword puzzle such as (but not exactly) below. Im
 
 Contenders do not need to submit the whole completed puzzle. Rather, only a handful of characters are asked, such as charter 23, 11, 24, 20. Usually these would form a meaningful keyword of some sort such as "FISH".
 
-And yes that's all one would get - Unlike what we usually see in crossword puzzles in newspaper, **there is no hint whatsoever**. According to [puzzler.com](https://www.puzzler.com/puzzles-a-z/codeword):
+Unlike crossword puzzles we see in newspaper, **there is no hint whatsoever**. According to [puzzler.com](https://www.puzzler.com/puzzles-a-z/codeword), a codeword puzzle is:
 
 > A codeword is a completed crossword grid where each letter of the alphabet has been substituted for a number from 1-26. There will be at least one occurrence of each letter of the alphabet. Certain letters are given as starters. The solver must decipher the rest of the code to discover the words in the completed puzzle.
 
-Below I would demonstrate how Prolog could be used to solve this puzzle, interactively, step by step. I avoid use of technical terms such as "instantiation" and "unification" to make it easier for readers without prior knowledge with Prolog.
+Below I would demonstrate how Prolog could be used to solve this puzzle, interactively, step by step. I try to avoid use of Prolog jargons to make it easier for readers without prior experience with Prolog.
 
 # Dictionary
 
@@ -24,9 +24,13 @@ Obviously we need a library of English words before we can start asking Prolog t
 
 1. Capitalise every word e.g. Apple => APPLE
 2. Filter out any word with non-alphabetical characters e.g. 10-POINT (not sure why these were included in the first place)
-3. Transform word into Prolog fact e.g. APPLE => `word('APPLE')`.
+3. Transform words into Prolog facts e.g. APPLE => `word('APPLE')`.
 
-The outcome is called `word.pl`. Content looks like:
+<!--
+A fact in Prolog is a truthful predicate as in predicate logic. More example: `mortal(socrates)`, `is_taller_than(lebron_james, me)`.
+-->
+
+The outcome is Prolog file `word.pl`. Content looks like:
 
 ~~~~
 word('APPLE').
@@ -36,7 +40,7 @@ word('PINEAPPLE').
 word('STRAWBERRY').
 ~~~~
 
-The real file has 416295 lines and could be found in this repository [here](../word.pl). To start having fun, run swi-prolog in console and load our dictionary file by entering command:
+The real file has 416295 lines and could be found in this repository [here](../word.pl). To start having fun, run swi-prolog in console and load our dictionary file by entering commands:
 
 ~~~~
 swipl
@@ -45,15 +49,13 @@ consult('word.pl').
 
 ![swipl loaded word.pl](./assets/codeword-console-load-dictionary.png)
 
+Despite massive number of lines in `word.pl`, the file is loaded rather quickly, in just about 3 seconds on my laptop.
 
-
-Despite massive number of lines in `word.pl`, the file is loaded rather quickly, in just about 3 seconds.
-
-Now we can start interrogating swi-prolog. But how should we start? As starting point we are given three known mappings: 5 => C, 1 => R, 15 => U. The word [23, 5, 5, 1, 15, 12, 6] should be a good start as it contains four instances of known letters [5, 5, 1, 15]:
+Now we can start interrogating swi-prolog. As starting point we are already given three known mappings: char 5 => C, char 1 => R, char 15 => U. The word [23, 5, 5, 1, 15, 12, 6] should be a good start as it contains four instances of known chars [5, 5, 1, 15]:
 
 ![Codeword with first word highlighted](./assets/codeword-word1-highlighted.png)
 
-Enter below query to see what Prolog can find from knowing merely three mappings:
+Enter below query to see what answer Prolog is able to give by knowing merely three mappings:
 
 ~~~~
 format('~nQuery output:~n~n'),
@@ -68,26 +70,32 @@ nl,
 fail.
 ~~~~
 
+As this is a demonstration, I am not detailing logic of above code. There will (hopefully) be more explanations in later articles.
+
+Look at answers to `Word1` under the line "Query output":
+
 ![Query word1 and its output](./assets/codeword-querying-word1.png)
 
-Possible words denoted by [23, 5, 5, 1, 15, 12, 6] are surprisingly scarce - this might be an easy puzzle. From the output we can actually determine that character 23 maps to A. Character 12 and 16, however, could possibly map to [A, E] and [L, D, R, S] respectively. But let's not bother this for now and pretend [1, 5, 15] are the only knowns.
+Possible words denoted by [23, 5, 5, 1, 15, 12, 6] are surprisingly scarce - only four words. From the output we can actually determine that character 23 maps to A only. Character 12 and 16, however, could possibly map to [A, E] and [L, D, R, S] respectively.
 
-To progress further I label the word searched (w1 => `Word1` in code) and all known characters in the puzzle:
+To progress further we need to put more puzzle words into Prolog query. As visual aid, I highlight the word searched above (W1 => `Word1` in code) in orange and all known characters in the puzzle in purple:
 
 ![Codeword with word1 and known chars highlighted](./assets/codeword-mark-all-char-5-1-15-and-word1.png)
 
-Picking the second word to inquire, [5, 26, 12, 12, 1, 20, 15, 22] looks like a good choice:
+[5, 26, 12, 12, 1, 20, 15, 22] seems to be a good choice as second word:
 
 ![Codeword with word2 hightlighted](./assets/codeword-word2-highlighted.png)
 
 Because:
 
 1. It has three instances of known characters
-2. It contains character 12 which I believe has been determined in `Word1`
+2. It contains character 12 which is partially resolved `Word1` (A or E)
 
+<!--
 In Prolog, leveraging _known facts_ as heuristics is an important tactic for optimising search space (therefore, runtime). In word [5, 26, 12, 12, 1, 20, 15, 22], assuming character 12 is not determined, there are four unknown characters giving possible combinations of (26-4) x (26-5) x (26-6) x (26-7) = 175560. If we trust that character 12 has indeed been determined, there are only three unknowns leaving (26-4) x (26-5) x (26-6) = 9240 possible combinations.
 
 If another word, for exmaple, [19, 23, 15, 22, 24, 21, 9, 8] is used, where there are seven unknown characters, there could be (26-4) x (26-5) x (26-6) x (26-7) x (26-8) x (26-9) x (26-10) = 859541760 possibilities. This would likely damage runtime very badly. Take this for granted for now without further elaboration.
+-->
 
 So update query as below and run:
 
@@ -124,13 +132,15 @@ Word1 = ACCRUES
 Word2 = CHEERFUL
 ~~~~
 
-Result looks promising in that `Word2` appears to be completely resolved.
-
-We pick the next word to try by highlighting supposedly determined characters in the puzzle and look for the next plausible one. Having A (char 23) and E (char 12) resolved is really useful because they are most frequent among English words. Again we choose word that has relatively more known cracked characters:
+`Word2` resolves only to the word CHEERFUL. This means we have more characters definitely resolved: C12, C20, C22, C26. Again these are highlighted (in green) in the puzzle to aid picking next word:
 
 ![Codeword with more known chars and Word3 highlighted](./assets/codeword-word3-highlighted.png)
 
-[8, 21, 1, 23, 20, 20, 12] seems to be good choice because it has many known characters. Also char 21 and 23 are rather frequent in other unknown words.
+<!--
+Having A (char 23) and E (char 12) resolved is really useful because they are most frequent among English words. Again we choose word that has relatively more known characters
+-->
+
+[8, 21, 1, 23, 20, 20, 12] is chosen as `Word3` as it has many resolved characters. Also char 21 and 23 are rather frequent in other unknown words so it would be useful to have them found.
 
 Update query again and run:
 
@@ -162,7 +172,7 @@ Query output:
 
 Word1 = ACCRUED 
 Word2 = CHEERFUL
-Word3 = AGRAFFE    <==
+Word3 = AGRAFFE
 
 Word1 = ACCRUED 
 Word2 = CHEERFUL
@@ -170,7 +180,7 @@ Word3 = GIRAFFE
 
 Word1 = ACCRUER 
 Word2 = CHEERFUL
-Word3 = AGRAFFE    <==
+Word3 = AGRAFFE
 
 Word1 = ACCRUER 
 Word2 = CHEERFUL
@@ -178,7 +188,7 @@ Word3 = GIRAFFE
 
 Word1 = ACCRUES 
 Word2 = CHEERFUL
-Word3 = AGRAFFE    <==
+Word3 = AGRAFFE
 
 Word1 = ACCRUES 
 Word2 = CHEERFUL
@@ -186,6 +196,8 @@ Word3 = GIRAFFE
 
 false.
 ~~~~
+
+(Continue reviewing from here)
 
 Something interesting about this output. Prolog suggests `Word3` could be `AGRAFFE`. Although Prolog has not been told, yet we know that this cannot be the case, because unknown characters are distinct. Char 8 and 23 cannot both map to `A` at the same time.
 
