@@ -4,9 +4,11 @@
 Having started self-learning and using Prolog since 2016, I think I might be able to contribute a bit to Prolog by sharing some of my own use cases of the language.
 -->
 
+In this article I am illustrating the use of Prolog programming in solving codeword puzzle in an interactive and iterative manner. I start with a simple query (Prolog code) and explain how it could be iteratively improved towards one that gives correct answer to puzzle. If you think the description is too lengthy and boring, feel free to jump the the solution and output at [the end of article](#complete-solution).
+
 Recently I found a puzzle solving competition when randomly browsing in WH Smith. The compeition comes with cash prices and it attracted my attention. So I started pursuing in the hope to earn some extra money (I heard you laughed).
 
-The compeition is to solve a codeword puzzle such as (but not exactly) below. Image is taken from [puzzler.com](https://www.puzzler.com/media/puzzles/samples/Codeword.pdf):
+The compeition is to solve a codeword puzzle such as below. This puzzle is taken from [puzzler.com](https://www.puzzler.com/media/puzzles/samples/Codeword.pdf):
 
 ![Image of codeword puzzle](./assets/codeword-original.png)
 
@@ -16,21 +18,26 @@ Unlike crossword puzzles we see in newspaper, **there is no hint whatsoever**. A
 
 > A codeword is a completed crossword grid where each letter of the alphabet has been substituted for a number from 1-26. There will be at least one occurrence of each letter of the alphabet. Certain letters are given as starters. The solver must decipher the rest of the code to discover the words in the completed puzzle.
 
-Below I would demonstrate how Prolog could be used to solve this puzzle, interactively, step by step. I try to avoid use of Prolog jargons to make it easier for readers without prior experience with Prolog.
+In demonstration below I try to avoid use of Prolog jargons to make it easier for readers without prior experience with Prolog. Familiarity with command line is expected.
+
+# Prolog Interpreter
+
+[swi-prolog](https://www.swi-prolog.org/) has always been my choice of implementation. But I believe any other reasonably recent implementations would work.
 
 # Dictionary
 
-Obviously we need a library of English words before we can start asking Prolog to guess for us. For this I download English word dictionary from [words.txt](https://github.com/dwyl/english-words/blob/master/words.txt) from github project by [dwyl](https://github.com/dwyl/english-words). The text file is transformed into a Prolog source file by:
+Obviously we need a library of English words before we can start asking Prolog to guess for us. For this I download English word dictionary from [words.txt](https://github.com/dwyl/english-words/blob/master/words.txt) from github project by [dwyl](https://github.com/dwyl/english-words). The text file is then transformed into a Prolog source file by:
 
 1. Capitalise every word e.g. Apple => APPLE
 2. Filter out any word with non-alphabetical characters e.g. 10-POINT (not sure why these were included in the first place)
-3. Transform words into Prolog facts e.g. APPLE => `word('APPLE')`.
+3. Transform each word into Prolog fact e.g. APPLE => `word('APPLE')`.
 
+Prolog is a logic programming langauge. To make deduction it needs facts to start with. `word` statements are the facts we are asserting.
 <!--
 A fact in Prolog is a truthful predicate as in predicate logic. More example: `mortal(socrates)`, `is_taller_than(lebron_james, me)`.
 -->
 
-The outcome is Prolog file `word.pl`. Content looks like:
+Outcome is Prolog file `word.pl`. Content looks like:
 
 ~~~~
 word('APPLE').
@@ -51,7 +58,9 @@ consult('word.pl').
 
 Despite massive number of lines in `word.pl`, the file is loaded rather quickly, in just about 3 seconds on my laptop.
 
-Now we can start interrogating swi-prolog. As starting point we are already given three known mappings: char 5 => C, char 1 => R, char 15 => U. The word [23, 5, 5, 1, 15, 12, 6] should be a good start as it contains four instances of known chars [5, 5, 1, 15]:
+# Querying
+
+Now we can start interrogating swi-prolog. As starting point, we are already given three known mappings: char 5 => C, char 1 => R, char 15 => U. The word [23, 5, 5, 1, 15, 12, 6] should be a good start as it contains four instances of known chars [5, 5, 1, 15]:
 
 ![Codeword with first word highlighted](./assets/codeword-word1-highlighted.png)
 
@@ -65,12 +74,12 @@ C1 = 'R',
 C15 = 'U',
 word(Word1),
 string_chars(Word1, [C23, C5, C5, C1, C15, C12, C6]),
-format('Word1 = ~w', [Word1]), 
+format('Word1 = ~w', [Word1]),
 nl,
 fail.
 ~~~~
 
-As this is a demonstration, I am not detailing logic of above code. There will (hopefully) be more explanations in later articles.
+As this is a demonstration, I am not detailing logic of above code line-by-line. There will (hopefully) be more explanations in later articles.
 
 Look at answers to `Word1` under the line "Query output":
 
@@ -197,11 +206,9 @@ Word3 = GIRAFFE
 false.
 ~~~~
 
-(Continue reviewing from here)
+There is something interesting about this output. In some answers Prolog suggests `Word3` be `AGRAFFE`. We know that this cannot be the case since char 8 and 23 cannot both map to `A` at the same time. Also, char 21 is suggested to be either `G` or `I`.
 
-Something interesting about this output. Prolog suggests `Word3` could be `AGRAFFE`. Although Prolog has not been told, yet we know that this cannot be the case, because unknown characters are distinct. Char 8 and 23 cannot both map to `A` at the same time.
-
-Despite this we know that char 8 might be `A` or `G` while char 21 might be `G` or `I`. Let's ask Prolog to search for words that have char 8, char 21 and char 23 in the hope to have them nailed. [8, 15, 21, 6, 23, 9, 5, 12] looks like the definite choice:
+Following the same method, I will pick [8, 15, 21, 6, 23, 9, 5, 12] as the next word to be added to query.
 
 ![Codeword with Word4 highlighted](./assets/codeword-word4-highlighted.png)
 
@@ -229,7 +236,8 @@ nl,
 fail.
 ~~~~
 
-In Prolog's respond we can see the uncertainties above are resolved since the output contains exactly one set of `Word[1-4]`:
+Prolog responds with:
+<!-- In Prolog's respond we can see the uncertainties above are resolved since the output contains exactly one set of `Word[1-4]`: -->
 
 ~~~~
 Query output:
@@ -242,127 +250,10 @@ Word4 = GUIDANCE
 false.
 ~~~~
 
-Furthermore char 6 and 9 are determined as `D` and `N` respectively. This time I am taking a greater leap by adding four more words in the query, introducing unknown characters 2, 3, 10 and 18:
 
-!['Codeword with Word5-8 highlighted](./assets/codeword-word5-to-word8-highlighted.png)
+# Complete Solution
 
-~~~~
-format('~nQuery output:~n~n'),
-
-C5 = 'C',
-C1 = 'R',
-C15 = 'U',
-
-word(Word1),
-string_chars(Word1, [C23, C5, C5, C1, C15, C12, C6]),
-word(Word2),
-string_chars(Word2, [C5, C26, C12, C12, C1, C20, C15, C22]),
-word(Word3),
-string_chars(Word3, [C8, C21, C1, C23, C20, C20, C12]),
-word(Word4),
-string_chars(Word4, [C8, C15, C21, C6, C23, C9, C5, C12]),
-
-word(Word5),
-string_chars(Word5, [C18, C9, C12, C23, C6]),
-word(Word6),
-string_chars(Word6, [C12, C3, C15, C23, C22]),
-word(Word7),
-string_chars(Word7, [C1, C12, C10, C12, C6, C21, C12, C6]),
-word(Word8),
-string_chars(Word8, [C6, C21, C9, C8, C2]),
-
-format('Word1 = ~w', [Word1]), nl,
-format('Word2 = ~w', [Word2]), nl,
-format('Word3 = ~w', [Word3]), nl,
-format('Word4 = ~w', [Word4]), nl,
-format('Word5 = ~w', [Word5]), nl,
-format('Word6 = ~w', [Word6]), nl,
-format('Word7 = ~w', [Word7]), nl,
-format('Word8 = ~w', [Word8]), nl,
-nl,
-fail.
-~~~~
-
-~~~~
-Query output:   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = KNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGE   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = KNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGY   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = KNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGO   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = KNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGS   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = SNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGE   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = SNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGY   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = SNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGO   
-                
-Word1 = ACCRUED 
-Word2 = CHEERFUL
-Word3 = GIRAFFE 
-Word4 = GUIDANCE
-Word5 = SNEAD   
-Word6 = EQUAL   
-Word7 = REMEDIED
-Word8 = DINGS   
-                
-false.          
-~~~~
-
-
-Final version which generates exactly one set of solution:
+Continuing with the same method, I have come up with below query which contains all the puzzle words with some "heuristics" to ease Prolog's deduction:
 
 ~~~~
 format('~nQuery output:~n~n'),
@@ -480,8 +371,56 @@ nth1(Ind1, Solution, X),
 nth1(Ind2, Solution, Y),
 X = Y,
 Ind1 \= Ind2,
-format('X = ~w   Ind1 = ~w   Y = ~w   Ind2 = ~w', [X, Y, Ind1, Ind2]), nl,
+format('X = ~w   Ind1 = ~w   Y = ~w   Ind2 = ~w', [X, Y, Ind1, Ind2]), nl, nl,
 
-nl,
 fail.
 ~~~~
+
+Newly added are:
+
+1. `format` statements to print each character and puzzle word nicely
+2. Duplication check at the end. A correct solution should have all characters map to distinct English letters
+
+It works well by generating exactly one answer, without duplicating characters:
+
+~~~~
+Query output:
+
+C1  = R   C2  = O   C3  = Q   C4  = J   C5  = C
+C6  = D   C7  = B   C8  = G   C9  = N   C10 = M
+C11 = Y   C12 = E   C13 = S   C14 = Z   C15 = U
+C16 = P   C17 = X   C18 = K   C19 = V   C20 = F
+C21 = I   C22 = L   C23 = A   C24 = T   C25 = W   C26 = H
+
+Word1  = ACCRUED
+Word2  = CHEERFUL
+Word3  = GIRAFFE
+Word4  = GUIDANCE
+Word5  = KNEAD
+Word6  = EQUAL
+Word7  = REMEDIED
+Word8  = DINGO
+Word9  = FOLD
+Word10 = JACKDAW
+Word11 = ACME
+Word12 = ADAPT
+Word13 = FENCE
+Word14 = JAZZ
+Word15 = VAULTING
+Word16 = NAPE
+Word17 = BLADE
+Word18 = SYNONYM
+Word19 = AGREE
+Word20 = BRAIN
+Word21 = ACCENT
+Word22 = VEXED
+Word23 = PUZZLED
+Word24 = AVAIL
+Word25 = CHEAPLY
+Word26 = SMUGLY
+
+Duplication:
+false.
+~~~~
+
+Voilà. We have the puzzle solved.
