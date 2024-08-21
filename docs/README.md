@@ -54,7 +54,7 @@ swipl
 consult('word.pl').
 ~~~~
 
-<img src="./assets/codeword-console-load-dictionary.png" width="50%" />
+<img src="./assets/codeword-console-load-dictionary.png" width="70%" />
 
 Despite massive number of lines in `word.pl`, the file is loaded rather quickly, in just about 3 seconds on my laptop.
 
