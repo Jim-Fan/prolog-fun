@@ -10,7 +10,7 @@ Recently I found a puzzle solving competition when randomly browsing in WH Smith
 
 The compeition is to solve a codeword puzzle such as below. This puzzle is taken from [puzzler.com](https://www.puzzler.com/media/puzzles/samples/Codeword.pdf):
 
-![Image of codeword puzzle](./assets/codeword-original.png)
+<img src="./assets/codeword-original.png" width="50%" />
 
 Contenders do not need to submit the whole completed puzzle. Rather, only a handful of characters are asked, such as charter 23, 11, 24, 20. Usually these would form a meaningful keyword of some sort such as "FISH".
 
@@ -54,7 +54,7 @@ swipl
 consult('word.pl').
 ~~~~
 
-![swipl loaded word.pl](./assets/codeword-console-load-dictionary.png)
+<img src="./assets/codeword-console-load-dictionary.png" width="50%" />
 
 Despite massive number of lines in `word.pl`, the file is loaded rather quickly, in just about 3 seconds on my laptop.
 
@@ -62,7 +62,7 @@ Despite massive number of lines in `word.pl`, the file is loaded rather quickly,
 
 Now we can start interrogating swi-prolog. As starting point, we are already given three known mappings: char 5 => C, char 1 => R, char 15 => U. The word [23, 5, 5, 1, 15, 12, 6] should be a good start as it contains four instances of known chars [5, 5, 1, 15]:
 
-![Codeword with first word highlighted](./assets/codeword-word1-highlighted.png)
+<img src="./assets/codeword-word1-highlighted.png" width="50%" />
 
 Enter below query to see what answer Prolog is able to give by knowing merely three mappings:
 
@@ -83,17 +83,17 @@ As this is a demonstration, I am not detailing logic of above code line-by-line.
 
 Look at answers to `Word1` under the line "Query output":
 
-![Query word1 and its output](./assets/codeword-querying-word1.png)
+<img src="./assets/codeword-querying-word1.png" width="50%" />
 
 Possible words denoted by [23, 5, 5, 1, 15, 12, 6] are surprisingly scarce - only four words. From the output we can actually determine that character 23 maps to A only. Character 12 and 16, however, could possibly map to [A, E] and [L, D, R, S] respectively.
 
 To progress further we need to put more puzzle words into Prolog query. As visual aid, I highlight the word searched above (W1 => `Word1` in code) in orange and all known characters in the puzzle in purple:
 
-![Codeword with word1 and known chars highlighted](./assets/codeword-mark-all-char-5-1-15-and-word1.png)
+<img src="./assets/codeword-mark-all-char-5-1-15-and-word1.png" width="50%" />
 
 [5, 26, 12, 12, 1, 20, 15, 22] seems to be a good choice as second word:
 
-![Codeword with word2 hightlighted](./assets/codeword-word2-highlighted.png)
+<img src="./assets/codeword-word2-highlighted.png" width="50%" />
 
 Because:
 
@@ -143,7 +143,7 @@ Word2 = CHEERFUL
 
 `Word2` resolves only to the word CHEERFUL. This means we have more characters definitely resolved: C12, C20, C22, C26. Again these are highlighted (in green) in the puzzle to aid picking next word:
 
-![Codeword with more known chars and Word3 highlighted](./assets/codeword-word3-highlighted.png)
+<img src="./assets/codeword-word3-highlighted.png" width="50%" />
 
 <!--
 Having A (char 23) and E (char 12) resolved is really useful because they are most frequent among English words. Again we choose word that has relatively more known characters
@@ -210,7 +210,7 @@ There is something interesting about this output. In some answers Prolog suggest
 
 Following the same method, I will pick [8, 15, 21, 6, 23, 9, 5, 12] as the next word to be added to query.
 
-![Codeword with Word4 highlighted](./assets/codeword-word4-highlighted.png)
+<img src="./assets/codeword-word4-highlighted.png" width="50%" />
 
 ~~~~
 format('~nQuery output:~n~n'),
@@ -378,8 +378,9 @@ fail.
 
 Newly added are:
 
-1. `format` statements to print each character and puzzle word nicely
-2. Duplication check at the end. A correct solution should have all characters map to distinct English letters
+1. More puzzle words, after some careful experimentations
+2. `format` statements to print each character and puzzle word nicely
+3. Duplication check at the end. A correct solution should have all characters map to distinct English letters
 
 It works well by generating exactly one answer, without duplicating characters:
 
@@ -423,4 +424,6 @@ Duplication:
 false.
 ~~~~
 
-Voilà. We have the puzzle solved.
+Voilà. We have the puzzle solved:
+
+<img src="./assets/codeword-solution.png" width="50%" />
